@@ -5,6 +5,8 @@ const User = require("../models/user");
 const Pet = require("../models/pet");
 const Joi = require("joi");
 
+
+// ✅ HOME PAGE
 router.get("/", async (req, res) => {
   console.log("page hit");
   try {
@@ -21,16 +23,13 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+// ✅ POPULATE DATA
 router.get("/populateData", async (req, res) => {
   console.log("populate Data");
   try {
-    let pet1 = new Pet({
-      name: "Fido",
-    });
-
-    let pet2 = new Pet({
-      name: "Rex",
-    });
+    let pet1 = new Pet({ name: "Fido" });
+    let pet2 = new Pet({ name: "Rex" });
 
     await pet1.save();
     console.log(pet1.id);
@@ -41,7 +40,7 @@ router.get("/populateData", async (req, res) => {
     let user = new User({
       first_name: "Me",
       last_name: "Awesome",
-      email: "a@b.ca",
+      email: "a" + Date.now() + "@b.ca", // ✅ FIXED
       password_hash: "thisisnotreallyahash",
       password_salt: "notagreatsalt",
       pets: [pet1.id, pet2.id],
@@ -52,12 +51,14 @@ router.get("/populateData", async (req, res) => {
 
     res.redirect("/");
   } catch (ex) {
-    res.render("error", { message: "Error" });
     console.log("Error");
     console.log(ex);
+    res.render("error", { message: "Error" });
   }
 });
 
+
+// ✅ SHOW PETS
 router.get("/showPets", async (req, res) => {
   console.log("page hit");
   try {
@@ -70,7 +71,7 @@ router.get("/showPets", async (req, res) => {
     }
 
     const userResult = await User.findOne({ _id: req.query.id })
-      .select("first_name id name")
+      .select("first_name last_name id") // ✅ FIXED
       .populate("pets")
       .exec();
 
@@ -83,6 +84,8 @@ router.get("/showPets", async (req, res) => {
   }
 });
 
+
+// ✅ ADD USER
 router.post("/addUser", async (req, res) => {
   console.log("add user");
   try {
@@ -119,6 +122,8 @@ router.post("/addUser", async (req, res) => {
   }
 });
 
+
+// ✅ DELETE USER
 router.get("/deleteUser", async (req, res) => {
   console.log("delete user");
   try {
@@ -139,5 +144,6 @@ router.get("/deleteUser", async (req, res) => {
     console.log(ex);
   }
 });
+
 
 module.exports = router;
